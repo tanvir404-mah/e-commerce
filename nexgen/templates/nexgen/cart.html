@@ -1,0 +1,97 @@
+{% extends 'base.html' %}
+{% block title %}Shopping Cart - NexGen{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+    <h1 class="text-4xl font-extrabold tracking-tight text-gray-900 mb-10 border-b pb-4">Shopping Cart</h1>
+    
+    {% if not items %}
+    <div class="text-center py-24 glass rounded-3xl mt-8 shadow-sm">
+        <i data-feather="shopping-cart" class="mx-auto h-20 w-20 text-gray-300 mb-6"></i>
+        <h2 class="text-2xl font-bold text-gray-900 mb-2">Your cart is empty</h2>
+        <p class="text-gray-500 mb-8">Looks like you haven't added anything to your cart yet.</p>
+        <a href="{% url 'home' %}" class="inline-flex items-center gap-2 bg-primary-500 text-white px-8 py-4 rounded-full font-bold hover:bg-primary-600 transition-colors shadow-lg hover:shadow-xl hover:-translate-y-1 transform">
+            <i data-feather="arrow-right" class="w-5 h-5"></i> Start Shopping
+        </a>
+    </div>
+    {% else %}
+    <div class="lg:grid lg:grid-cols-12 lg:gap-x-12 lg:items-start">
+        <div class="lg:col-span-8">
+            <ul class="divide-y divide-gray-200 glass rounded-3xl p-6 shadow-sm">
+                {% for item in items %}
+                <li class="flex py-6">
+                    <div class="h-24 w-24 flex-shrink-0 overflow-hidden rounded-xl border border-gray-100 p-2 bg-white flex items-center justify-center">
+                        {% if item.product.image %}
+                            <img src="{{ item.product.image.url }}" alt="{{ item.product.title }}" class="max-h-full max-w-full object-contain">
+                        {% else %}
+                            <i data-feather="package" class="text-gray-200 w-12 h-12"></i>
+                        {% endif %}
+                    </div>
+
+                    <div class="ml-4 flex flex-1 flex-col justify-between">
+                        <div>
+                            <div class="flex justify-between text-lg font-bold text-gray-900">
+                                <h3>
+                                    <a href="{% url 'product_detail' item.product.id %}" class="hover:text-primary-500 transition-colors">{{ item.product.title }}</a>
+                                </h3>
+                                <p class="ml-4 text-primary-600">{{ STORE_CURRENCY|default:'$' }}{{ item.product.get_display_price }}</p>
+                            </div>
+                            <p class="mt-1 text-sm text-gray-500 line-clamp-1">{{ item.product.description }}</p>
+                        </div>
+                        <div class="flex flex-1 items-end justify-between text-sm mt-4">
+                            <!-- Update Quantity Form -->
+                            <form method="post" action="{% url 'update_cart' item.id %}" class="flex items-center gap-2">
+                                {% csrf_token %}
+                                <input type="number" name="quantity" value="{{ item.quantity }}" min="1" max="{{ item.product.stock }}" class="w-16 border border-gray-200 rounded-md py-1 px-2 text-center text-sm font-bold shadow-sm focus:outline-none focus:ring-1 focus:ring-primary-500 focus:border-primary-500">
+                                <button type="submit" class="text-primary-500 hover:text-primary-600 font-medium px-2 py-1 rounded hover:bg-primary-50 transition-colors text-xs">Update</button>
+                            </form>
+
+                            <!-- Remove Button -->
+                            <form method="post" action="{% url 'update_cart' item.id %}">
+                                {% csrf_token %}
+                                <input type="hidden" name="quantity" value="0">
+                                <button type="submit" class="font-medium text-secondary-500 hover:text-secondary-600 flex items-center gap-1 transition-colors bg-red-50 px-3 py-1.5 rounded-full">
+                                    <i data-feather="trash-2" class="w-4 h-4"></i> Remove
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </li>
+                {% endfor %}
+            </ul>
+        </div>
+
+        <div class="mt-8 lg:mt-0 lg:col-span-4 glass p-8 rounded-3xl sticky top-24 shadow-md bg-gray-50/50">
+            <h2 class="text-xl font-extrabold text-gray-900 mb-6">Order Summary</h2>
+            <div class="flow-root">
+                <dl class="space-y-4 text-sm text-gray-600">
+                    <div class="flex items-center justify-between">
+                        <dt>Subtotal</dt>
+                        <dd class="font-medium text-gray-900">{{ STORE_CURRENCY|default:'$' }}{{ total_price }}</dd>
+                    </div>
+                    <div class="flex items-center justify-between">
+                        <dt>Shipping</dt>
+                        <dd class="font-medium text-gray-900">Calculated at checkout</dd>
+                    </div>
+                    <div class="flex items-center justify-between border-t border-gray-200 pt-4 text-lg">
+                        <dt class="text-base font-extrabold text-gray-900">Total order</dt>
+                        <dd class="text-2xl font-black text-gray-900">{{ STORE_CURRENCY|default:'$' }}{{ total_price }}</dd>
+                    </div>
+                </dl>
+            </div>
+
+            <div class="mt-8 relative">
+                <a href="{% url 'checkout' %}" class="w-full rounded-full border border-transparent bg-primary-500 px-6 py-4 text-base font-bold text-white shadow-lg hover:shadow-xl hover:-translate-y-1 hover:bg-primary-600 transition-all flex justify-center items-center gap-2">
+                    Checkout <i data-feather="arrow-right" class="w-5 h-5"></i>
+                </a>
+            </div>
+            <div class="mt-6 flex justify-center text-center text-sm text-gray-500">
+                <p>
+                    or <a href="{% url 'home' %}" class="font-medium text-primary-500 hover:text-primary-400">Continue Shopping <span aria-hidden="true">&rarr;</span></a>
+                </p>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

@@ -1,0 +1,204 @@
+{% extends 'base.html' %}
+{% block title %}Order #{{ order.id }} - NexGen{% endblock %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+    <!-- Header -->
+    <div class="flex flex-col sm:flex-row sm:items-center justify-between mb-8 gap-4">
+        <div>
+            <a href="{% url 'dashboard' %}" class="flex items-center gap-2 text-sm text-gray-500 hover:text-primary-500 transition-colors mb-2">
+                <i data-feather="arrow-left" class="w-4 h-4"></i> Back to Dashboard
+            </a>
+            <h1 class="text-3xl font-extrabold text-gray-900">Order #{{ order.id }}</h1>
+            <p class="text-sm text-gray-400 mt-1 flex items-center gap-1">
+                <i data-feather="clock" class="w-4 h-4"></i>
+                Placed on {{ order.created_at|date:"F j, Y, g:i a" }}
+            </p>
+        </div>
+        <div class="flex items-center gap-3">
+            <span class="inline-flex items-center px-4 py-1.5 rounded-full text-sm font-bold
+                {% if order.status == 'Delivered' %}bg-green-100 text-green-800
+                {% elif order.status == 'Cancelled' or order.status == 'Refund Requested' %}bg-red-100 text-red-800
+                {% elif order.status == 'Shipped' or order.status == 'Out for Delivery' %}bg-blue-100 text-blue-800
+                {% else %}bg-yellow-100 text-yellow-800{% endif %}">
+                {{ order.status }}
+            </span>
+        </div>
+    </div>
+
+    <!-- Tracking Timeline -->
+    {% if not cancelled %}
+    <div class="glass rounded-3xl p-8 shadow-sm mb-6 border border-gray-100">
+        <h2 class="text-lg font-bold text-gray-900 mb-8 flex items-center gap-2">
+            <i data-feather="navigation" class="text-primary-500 w-5 h-5"></i> Order Tracking
+        </h2>
+        <div class="relative">
+            <!-- Progress line -->
+            <div class="absolute left-5 top-5 bottom-5 w-0.5 bg-gray-200"></div>
+            <div class="absolute left-5 top-5 w-0.5 bg-primary-400 transition-all" id="tracking-progress" data-step="{{ current_index }}" data-total="{{ all_statuses|length }}"></div>
+
+            <div class="space-y-8 relative">
+                {% for status in all_statuses %}
+                {% with idx=forloop.counter0 %}
+                <div class="flex items-start gap-5">
+                    <div class="relative z-10 flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center
+                        {% if idx <= current_index %}bg-primary-500 text-white shadow-lg shadow-primary-200{% else %}bg-white border-2 border-gray-200 text-gray-400{% endif %}">
+                        {% if idx < current_index %}
+                            <i data-feather="check" class="w-5 h-5"></i>
+                        {% elif idx == current_index %}
+                            <div class="w-3 h-3 bg-white rounded-full animate-pulse"></div>
+                        {% else %}
+                            <div class="w-2 h-2 bg-gray-300 rounded-full"></div>
+                        {% endif %}
+                    </div>
+                    <div class="pt-2">
+                        <p class="font-semibold {% if idx == current_index %}text-primary-600{% elif idx < current_index %}text-gray-700{% else %}text-gray-400{% endif %}">
+                            {{ status }}
+                        </p>
+                        {% if idx == current_index %}
+                        <p class="text-xs text-gray-400 mt-0.5">Current status</p>
+                        {% elif idx < current_index %}
+                        <p class="text-xs text-gray-400 mt-0.5">Completed</p>
+                        {% endif %}
+                    </div>
+                </div>
+                {% endwith %}
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+    {% else %}
+    <div class="glass rounded-2xl p-5 mb-6 border border-red-200 bg-red-50 flex items-center gap-4">
+        <i data-feather="x-circle" class="w-6 h-6 text-red-500 flex-shrink-0"></i>
+        <div>
+            <p class="font-bold text-red-700">{{ order.status }}</p>
+            <p class="text-sm text-red-500 mt-0.5">This order has been {{ order.status|lower }}.</p>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Payment Status Banner -->
+    {% if not order.is_paid and order.transaction_id %}
+    <div class="glass rounded-3xl p-6 mb-8 border border-amber-200 bg-amber-50 flex flex-col sm:flex-row items-center gap-4 shadow-sm">
+        <div class="w-12 h-12 rounded-2xl bg-amber-100 text-amber-600 flex items-center justify-center flex-shrink-0">
+            <i data-feather="clock" class="w-6 h-6 animate-spin-slow"></i>
+        </div>
+        <div class="flex-1 text-center sm:text-left">
+            <h3 class="font-black text-amber-900 uppercase tracking-tight text-lg">Pending Verification</h3>
+            <p class="text-sm text-amber-700 leading-relaxed">
+                We've received your payment details (TrxID: <strong>{{ order.transaction_id }}</strong>). Our team is currently verifying the transaction. Your order status will update to <strong>'Processing'</strong> once confirmed.
+            </p>
+        </div>
+    </div>
+    {% elif order.is_paid %}
+    <div class="glass rounded-3xl p-6 mb-8 border border-green-200 bg-green-50 flex items-center gap-4 shadow-sm">
+        <div class="w-12 h-12 rounded-2xl bg-green-100 text-green-600 flex items-center justify-center flex-shrink-0">
+            <i data-feather="shield-check" class="w-6 h-6"></i>
+        </div>
+        <div>
+            <h3 class="font-black text-green-900 uppercase tracking-tight text-lg">Payment Verified</h3>
+            <p class="text-sm text-green-700">Thank you! Your payment has been successfully verified.</p>
+        </div>
+    </div>
+    {% endif %}
+
+    <div class="grid md:grid-cols-2 gap-6 mb-6">
+        <!-- Shipping -->
+        <div class="glass rounded-3xl p-6 shadow-sm border border-gray-100">
+            <h2 class="text-base font-bold text-gray-900 mb-3 flex items-center gap-2">
+                <i data-feather="map-pin" class="text-primary-500 w-4 h-4"></i> Shipping Address
+            </h2>
+            <p class="text-sm text-gray-600 whitespace-pre-line">{{ order.shipping_address }}</p>
+        </div>
+
+        <!-- Payment -->
+        <div class="glass rounded-3xl p-6 shadow-sm border border-gray-100">
+            <h2 class="text-base font-bold text-gray-900 mb-3 flex items-center gap-2">
+                <i data-feather="credit-card" class="text-primary-500 w-4 h-4"></i> Payment Details
+            </h2>
+            <p class="text-sm text-gray-600">Method: <span class="font-semibold text-gray-900">{{ order.payment_provider.provider_name|default:"Manual Payment" }}</span></p>
+            {% if order.transaction_id %}
+            <p class="text-xs text-gray-400 mt-1">TrxID: <span class="font-mono text-gray-500 font-bold select-all">{{ order.transaction_id }}</span></p>
+            {% endif %}
+            <div class="mt-3 space-y-1.5 text-sm">
+                <div class="flex justify-between text-gray-600">
+                    <span>Subtotal</span>
+                    <span>{{ STORE_CURRENCY|default:'$' }}{{ order.total_price }}</span>
+                </div>
+                {% if order.discount_amount %}
+                <div class="flex justify-between text-green-600">
+                    <span>Discount {% if order.coupon %}({{ order.coupon.code }}){% endif %}</span>
+                    <span>−{{ STORE_CURRENCY|default:'$' }}{{ order.discount_amount }}</span>
+                </div>
+                {% endif %}
+                <div class="flex justify-between font-black text-gray-900 text-base border-t border-gray-200 pt-2 mt-2">
+                    <span>Total Paid</span>
+                    <span>{{ STORE_CURRENCY|default:'$' }}{{ order.final_price }}</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Items -->
+    <div class="glass rounded-3xl p-6 shadow-sm border border-gray-100 mb-6">
+        <h2 class="text-base font-bold text-gray-900 mb-4 flex items-center gap-2">
+            <i data-feather="package" class="text-primary-500 w-4 h-4"></i> Items Ordered
+        </h2>
+        <ul class="divide-y divide-gray-100">
+            {% for item in items %}
+            <li class="py-4 flex items-center gap-4">
+                <div class="w-16 h-16 rounded-xl bg-gray-50 border border-gray-100 flex items-center justify-center p-1.5 flex-shrink-0">
+                    {% if item.product.image %}
+                        <img src="{{ item.product.image.url }}" alt="{{ item.product.title }}" class="max-h-full max-w-full object-contain">
+                    {% else %}
+                        <i data-feather="package" class="w-8 h-8 text-gray-300"></i>
+                    {% endif %}
+                </div>
+                <div class="flex-1 min-w-0">
+                    <a href="{% url 'product_detail' item.product.id %}" class="font-semibold text-gray-900 hover:text-primary-600 transition-colors text-sm line-clamp-1">{{ item.product.title }}</a>
+                    <div class="flex items-center gap-3 mt-1">
+                        <p class="text-xs text-gray-500">{{ STORE_CURRENCY|default:'$' }}{{ item.price }} × {{ item.quantity }}</p>
+                        {% if order.status == 'Delivered' or order.status == 'Shipped' or order.status == 'Processing' %}
+                        <a href="{% url 'product_detail' item.product.id %}#star-picker" class="text-xs font-bold text-primary-600 hover:underline flex items-center gap-1">
+                            <i data-feather="edit-3" class="w-3 h-3"></i> Review Product
+                        </a>
+                        {% endif %}
+                    </div>
+                </div>
+                <span class="font-black text-gray-900 text-base flex-shrink-0">{{ STORE_CURRENCY|default:'$' }}{{ item.subtotal }}</span>
+            </li>
+            {% endfor %}
+        </ul>
+    </div>
+
+    <!-- Actions -->
+    <div class="flex flex-wrap items-center gap-4">
+        <form method="post" action="{% url 'reorder' order.id %}" class="inline">
+            {% csrf_token %}
+            <button type="submit" class="flex items-center gap-2 px-6 py-3 rounded-full bg-gray-900 text-white font-bold text-sm hover:bg-gray-700 transition-all hover:-translate-y-0.5">
+                <i data-feather="refresh-cw" class="w-4 h-4"></i> Reorder
+            </button>
+        </form>
+
+        {% if order.status == 'Delivered' %}
+        <form method="post" action="{% url 'request_refund' order.id %}">
+            {% csrf_token %}
+            <button type="submit" onclick="return confirm('Are you sure you want to request a refund?')" class="flex items-center gap-2 px-6 py-3 rounded-full border-2 border-red-300 text-red-500 font-bold text-sm hover:bg-red-50 transition-all">
+                <i data-feather="rotate-ccw" class="w-4 h-4"></i> Request Refund
+            </button>
+        </form>
+        {% endif %}
+    </div>
+</div>
+
+<script>
+// Drive tracking progress bar
+const bar = document.getElementById('tracking-progress');
+if (bar) {
+    const step = parseInt(bar.dataset.step);
+    const total = parseInt(bar.dataset.total);
+    const pct = total > 1 ? (step / (total - 1)) * 100 : 0;
+    bar.style.height = pct + '%';
+}
+</script>
+{% endblock %}

@@ -1,0 +1,68 @@
+{% extends 'admin_panel/admin_base.html' %}
+{% block title %}Manage Coupons - NexGen Admin{% endblock %}
+
+{% block content %}
+<div class="mb-8 flex justify-between items-center border-b border-gray-200 pb-4">
+    <div>
+        <h1 class="text-3xl font-extrabold text-gray-900">Manage Coupons</h1>
+        <p class="text-gray-500 mt-1">Create and manage discount codes.</p>
+    </div>
+    <a href="{% url 'admin_coupon_create' %}" class="bg-primary-600 text-white px-5 py-2.5 rounded-xl font-medium flex items-center gap-2 hover:bg-primary-700 transition-colors shadow-sm">
+        <i data-feather="plus" class="w-4 h-4"></i> Add Coupon
+    </a>
+</div>
+
+<div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden max-w-5xl">
+    <div class="overflow-x-auto">
+        <table class="w-full text-left text-sm text-gray-600 min-w-max">
+            <thead class="bg-gray-50/80 text-xs uppercase font-bold text-gray-500 border-b border-gray-100">
+                <tr>
+                    <th scope="col" class="px-6 py-4 rounded-tl-lg">Code</th>
+                    <th scope="col" class="px-6 py-4">Discount</th>
+                    <th scope="col" class="px-6 py-4">Min. Order</th>
+                    <th scope="col" class="px-6 py-4">Status</th>
+                    <th scope="col" class="px-6 py-4 text-right">Actions</th>
+                </tr>
+            </thead>
+            <tbody class="divide-y divide-gray-100">
+                {% for coupon in coupons %}
+                <tr class="hover:bg-gray-50 transition-colors group">
+                    <td class="px-6 py-4 font-bold text-gray-900">{{ coupon.code }}</td>
+                    <td class="px-6 py-4 font-medium">
+                        {% if coupon.discount_type == 'percent' %}{{ coupon.value }}%{% else %}${{ coupon.value }}{% endif %}
+                    </td>
+                    <td class="px-6 py-4">${{ coupon.min_order }}</td>
+                    <td class="px-6 py-4">
+                        {% if coupon.is_active %}
+                            <span class="bg-green-100 text-green-700 font-bold px-2 py-1 rounded-md text-xs">Active</span>
+                        {% else %}
+                            <span class="bg-red-100 text-red-700 font-bold px-2 py-1 rounded-md text-xs">Inactive</span>
+                        {% endif %}
+                    </td>
+                    <td class="px-6 py-4 text-right">
+                        <div class="flex items-center justify-end gap-2">
+                            <a href="{% url 'admin_coupon_update' coupon.id %}" class="p-2 text-gray-400 hover:text-blue-500 transition-colors bg-gray-50 hover:bg-blue-50 rounded-lg">
+                                <i data-feather="edit-2" class="w-4 h-4"></i>
+                            </a>
+                            <a href="{% url 'admin_coupon_delete' coupon.id %}" class="p-2 text-gray-400 hover:text-red-500 transition-colors bg-gray-50 hover:bg-red-50 rounded-lg">
+                                <i data-feather="trash-2" class="w-4 h-4"></i>
+                            </a>
+                        </div>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="5" class="px-6 py-12 text-center text-gray-500">
+                        <div class="flex flex-col items-center justify-center">
+                            <i data-feather="gift" class="w-12 h-12 text-gray-200 mb-3"></i>
+                            <p class="font-medium text-lg text-gray-900">No coupons found</p>
+                            <p class="text-sm">Create coupons to give your customers discounts.</p>
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

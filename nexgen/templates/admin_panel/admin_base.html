@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Store Admin - NexGen{% endblock %}</title>
+    
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Custom Tailwind Configuration -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: {
+                            50: '#eff6ff', 100: '#dbeafe', 200: '#bfdbfe', 300: '#93c5fd', 400: '#60a5fa',
+                            500: '#3b82f6', 600: '#2563eb', 700: '#1d4ed8', 800: '#1e40af', 900: '#1e3a8a',
+                        },
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'system-ui', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    
+    <!-- Feather Icons -->
+    <script src="https://unpkg.com/feather-icons"></script>
+
+    <style>
+        body { font-family: 'Inter', sans-serif; background-color: #f8fafc; }
+        .sidebar-active { background-color: #eff6ff; color: #2563eb; font-weight: 600; border-right: 4px solid #2563eb; }
+    </style>
+</head>
+<body class="text-gray-900 min-h-screen flex">
+
+    <!-- Sidebar -->
+    <aside class="w-64 bg-white border-r border-gray-200 flex flex-col hidden md:flex fixed h-full z-10 shadow-sm">
+        <div class="h-16 flex items-center px-6 border-b border-gray-100">
+            <a href="{% url 'admin_dashboard' %}" class="flex items-center gap-2 group">
+                <div class="bg-primary-500 rounded-lg p-1.5 flex items-center justify-center">
+                    <i data-feather="settings" class="text-white w-5 h-5 group-hover:rotate-90 transition-transform duration-500"></i>
+                </div>
+                <span class="font-extrabold text-lg tracking-tight text-gray-900">Store Admin</span>
+            </a>
+        </div>
+
+        <nav class="flex-1 py-6 flex flex-col gap-1 px-4">
+            <p class="px-2 text-xs font-bold text-gray-400 uppercase tracking-widest mb-2">Main Menu</p>
+            
+            <a href="{% url 'admin_dashboard' %}" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-gray-600 hover:bg-gray-50 hover:text-gray-900 transition-colors {% if request.resolver_match.url_name == 'admin_dashboard' %}sidebar-active{% endif %}">
+                <i data-feather="grid" class="w-5 h-5"></i> Dashboard
+            </a>
+            
+            <a href="{% url 'admin_orders_list' %}" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-gray-600 hover:bg-gray-50 hover:text-gray-900 transition-colors {% if 'order' in request.resolver_match.url_name %}sidebar-active{% endif %}">
+                <i data-feather="shopping-cart" class="w-5 h-5"></i> Orders
+                <!-- Example Notification Badge -->
+                <span class="ml-auto bg-primary-100 text-primary-700 py-0.5 px-2 rounded-full text-xs font-bold">New</span>
+            </a>
+            
+            <a href="{% url 'admin_refunds_list' %}" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-gray-600 hover:bg-gray-50 hover:text-gray-900 transition-colors {% if 'refund' in request.resolver_match.url_name %}sidebar-active{% endif %}">
+                <i data-feather="corner-down-left" class="w-5 h-5"></i> Refunds
+            </a>
+            
+            <a href="{% url 'admin_products_list' %}" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-gray-600 hover:bg-gray-50 hover:text-gray-900 transition-colors {% if 'product' in request.resolver_match.url_name %}sidebar-active{% endif %}">
+                <i data-feather="package" class="w-5 h-5"></i> Products
+            </a>
+            
+            <a href="{% url 'admin_categories_list' %}" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-gray-600 hover:bg-gray-50 hover:text-gray-900 transition-colors {% if 'categor' in request.resolver_match.url_name %}sidebar-active{% endif %}">
+                <i data-feather="tag" class="w-5 h-5"></i> Categories
+            </a>
+
+            <a href="{% url 'admin_users_list' %}" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-gray-600 hover:bg-gray-50 hover:text-gray-900 transition-colors {% if 'user' in request.resolver_match.url_name %}sidebar-active{% endif %}">
+                <i data-feather="users" class="w-5 h-5"></i> Customers
+            </a>
+
+            <a href="{% url 'admin_reviews_queue' %}" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-gray-600 hover:bg-gray-50 hover:text-gray-900 transition-colors {% if 'review' in request.resolver_match.url_name %}sidebar-active{% endif %}">
+                <i data-feather="star" class="w-5 h-5"></i> Reviews
+            </a>
+
+            <a href="{% url 'admin_banners_list' %}" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-gray-600 hover:bg-gray-50 hover:text-gray-900 transition-colors {% if 'banner' in request.resolver_match.url_name %}sidebar-active{% endif %}">
+                <i data-feather="image" class="w-5 h-5"></i> Banners
+            </a>
+
+            <a href="{% url 'admin_coupons_list' %}" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-gray-600 hover:bg-gray-50 hover:text-gray-900 transition-colors {% if 'coupon' in request.resolver_match.url_name %}sidebar-active{% endif %}">
+                <i data-feather="gift" class="w-5 h-5"></i> Coupons
+            </a>
+
+            <a href="{% url 'admin_payments_list' %}" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-gray-600 hover:bg-gray-50 hover:text-gray-900 transition-colors {% if 'payment' in request.resolver_match.url_name %}sidebar-active{% endif %}">
+                <i data-feather="credit-card" class="w-5 h-5"></i> Payment Methods
+            </a>
+            
+            <a href="{% url 'admin_settings' %}" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-gray-600 hover:bg-gray-50 hover:text-gray-900 transition-colors {% if 'settings' in request.resolver_match.url_name %}sidebar-active{% endif %}">
+                <i data-feather="settings" class="w-5 h-5"></i> Settings
+            </a>
+        </nav>
+
+        <div class="p-4 border-t border-gray-100">
+            <a href="{% url 'home' %}" class="flex items-center gap-3 px-3 py-2 rounded-xl text-sm font-medium text-gray-500 hover:bg-gray-100 transition-colors">
+                <i data-feather="external-link" class="w-4 h-4"></i> View Live Site
+            </a>
+            <form method="post" action="{% url 'logout' %}" class="w-full mt-2">
+                {% csrf_token %}
+                <button type="submit" class="w-full flex items-center justify-center gap-2 py-2 text-sm font-medium text-red-600 bg-red-50 rounded-xl hover:bg-red-100 transition-colors">
+                    <i data-feather="log-out" class="w-4 h-4"></i> Logout
+                </button>
+            </form>
+        </div>
+    </aside>
+
+    <!-- Main Content Area -->
+    <div class="flex-1 md:ml-64 flex flex-col min-h-screen">
+        <!-- Topbar -->
+        <header class="h-16 bg-white border-b border-gray-200 flex items-center justify-end px-8 sticky top-0 z-40 shadow-sm">
+            <div class="flex items-center gap-4">
+                <span class="text-sm font-medium text-gray-700">Logged in as <strong class="text-primary-600">{{ request.user.first_name|default:"SuperAdmin" }}</strong></span>
+                <div class="h-8 w-8 bg-primary-100 rounded-full flex items-center justify-center border border-primary-200 shadow-sm border-2 border-white ring-2 ring-primary-100">
+                    <i data-feather="user" class="text-primary-600 w-4 h-4"></i>
+                </div>
+            </div>
+        </header>
+
+        <!-- Messages -->
+        {% if messages %}
+        <div class="px-8 pt-6">
+            {% for message in messages %}
+            <div class="p-4 rounded-xl text-sm font-bold flex items-center gap-3 shadow-sm {% if message.tags == 'error' %}bg-red-50 text-red-700 border border-red-200{% else %}bg-green-50 text-green-700 border border-green-200{% endif %}">
+                <i data-feather="{% if message.tags == 'error' %}alert-circle{% else %}check-circle{% endif %}" class="w-5 h-5"></i> {{ message }}
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        <!-- Content rendering -->
+        <main class="flex-1 p-8">
+            {% block content %}{% endblock %}
+        </main>
+    </div>
+
+    <script>
+      feather.replace()
+    </script>
+</body>
+</html>

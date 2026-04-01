@@ -1,0 +1,51 @@
+{% extends 'admin_panel/admin_base.html' %}
+{% block title %}Customers - Admin Panel{% endblock %}
+
+{% block content %}
+<div class="mb-8 flex justify-between items-center">
+    <div>
+        <h1 class="text-3xl font-extrabold text-gray-900">Manage Customers</h1>
+        <p class="text-gray-500 mt-1">View and manage registered accounts.</p>
+    </div>
+</div>
+
+<div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+    <div class="overflow-x-auto">
+        <table class="w-full text-left text-sm text-gray-600">
+            <thead class="bg-gray-50 text-xs uppercase font-bold text-gray-500 border-b border-gray-100">
+                <tr>
+                    <th scope="col" class="px-6 py-4">Customer</th>
+                    <th scope="col" class="px-6 py-4">Status</th>
+                    <th scope="col" class="px-6 py-4">Joined</th>
+                    <th scope="col" class="px-6 py-4 text-right">Action</th>
+                </tr>
+            </thead>
+            <tbody class="divide-y divide-gray-100">
+                {% for user_obj in users %}
+                <tr class="hover:bg-gray-50 transition-colors">
+                    <td class="px-6 py-4">
+                        <div class="font-bold text-gray-900">{{ user_obj.email }}</div>
+                        <div class="text-xs text-gray-500">{{ user_obj.first_name }} {{ user_obj.last_name }} {% if user_obj.is_staff %}<span class="text-blue-500">(Staff)</span>{% endif %}</div>
+                    </td>
+                    <td class="px-6 py-4">
+                        {% if user_obj.is_active %}
+                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold bg-green-100 text-green-800">Active</span>
+                        {% else %}
+                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold bg-red-100 text-red-800">Deactivated</span>
+                        {% endif %}
+                    </td>
+                    <td class="px-6 py-4 text-gray-500">{{ user_obj.date_joined|date:"M d, Y" }}</td>
+                    <td class="px-6 py-4 text-right">
+                        <a href="{% url 'admin_user_detail' user_obj.id %}" class="text-primary-600 hover:text-primary-800 font-medium hover:underline flex items-center justify-end gap-1">View Profile <i data-feather="chevron-right" class="w-4 h-4"></i></a>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="4" class="px-6 py-12 text-center text-gray-500 font-medium">No customers found.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

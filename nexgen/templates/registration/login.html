@@ -1,0 +1,63 @@
+{% extends 'base.html' %}
+{% block title %}Log In - NexGen{% endblock %}
+
+{% block content %}
+<div class="min-h-[80vh] flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8 relative overflow-hidden">
+    <!-- Decorative Background Elements -->
+    <div class="absolute top-[-10%] left-[-10%] w-96 h-96 bg-primary-100 rounded-full mix-blend-multiply filter blur-3xl opacity-50 animate-blob"></div>
+    <div class="absolute top-[20%] right-[-10%] w-72 h-72 bg-secondary-100 rounded-full mix-blend-multiply filter blur-3xl opacity-50 animate-blob" style="animation-delay: 2s;"></div>
+    
+    <div class="max-w-md w-full space-y-8 glass rounded-[3rem] p-10 relative z-10 shadow-2xl border border-white/50">
+        <div>
+            <h2 class="mt-6 text-center text-4xl font-extrabold text-gray-900 tracking-tight">
+                Welcome back
+            </h2>
+            <p class="mt-2 text-center text-sm text-gray-600">
+                Or
+                <a href="{% url 'register' %}" class="font-medium text-primary-600 hover:text-primary-500 transition-colors border-b border-transparent hover:border-primary-500 pb-0.5">
+                    create a new account
+                </a>
+            </p>
+        </div>
+
+        <form method="post" class="mt-8 space-y-6">
+            {% csrf_token %}
+            
+            {% if form.non_field_errors %}
+                <div class="bg-red-50 text-red-600 p-3 rounded-xl text-sm font-medium border border-red-100">
+                    {{ form.non_field_errors }}
+                </div>
+            {% endif %}
+
+            <div class="rounded-md shadow-sm space-y-4">
+                <!-- Username (Email) -->
+                <div class="relative group">
+                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                        <i data-feather="mail" class="h-5 w-5 text-gray-400 group-focus-within:text-primary-500 transition-colors"></i>
+                    </div>
+                    <input type="text" name="username" id="id_username" required class="appearance-none rounded-2xl relative block w-full px-3 py-4 pl-10 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent sm:text-sm bg-white/50 backdrop-blur-sm transition-all shadow-sm" placeholder="Email address">
+                    {{ form.username.errors }}
+                </div>
+                
+                <!-- Password -->
+                <div class="relative group">
+                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                        <i data-feather="key" class="h-5 w-5 text-gray-400 group-focus-within:text-primary-500 transition-colors"></i>
+                    </div>
+                    <input type="password" name="password" id="id_password" required class="appearance-none rounded-2xl relative block w-full px-3 py-4 pl-10 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent sm:text-sm bg-white/50 backdrop-blur-sm transition-all shadow-sm" placeholder="Password">
+                    {{ form.password.errors }}
+                </div>
+            </div>
+
+            <input type="hidden" name="next" value="{{ next|default:"/" }}">
+
+            <div>
+                <button type="submit" class="group relative w-full flex justify-center items-center py-4 px-4 border border-transparent text-lg font-bold rounded-full text-white bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 shadow-lg hover:shadow-xl hover:-translate-y-1 transition-all">
+                    Sign In
+                    <i data-feather="arrow-right" class="w-5 h-5 ml-2 opacity-0 group-hover:opacity-100 transition-opacity"></i>
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

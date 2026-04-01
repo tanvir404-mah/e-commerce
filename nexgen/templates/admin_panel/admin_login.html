@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Login - NexGen</title>
+    
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Custom Tailwind Config -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: {
+                            50: '#eff6ff', 100: '#dbeafe', 200: '#bfdbfe', 300: '#93c5fd', 400: '#60a5fa',
+                            500: '#3b82f6', 600: '#2563eb', 700: '#1d4ed8', 800: '#1e40af', 900: '#1e3a8a',
+                        },
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'system-ui', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/feather-icons"></script>
+    
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+    </style>
+</head>
+<body class="bg-gray-900 text-white min-h-screen flex items-center justify-center p-4">
+
+    <div class="max-w-md w-full bg-gray-800 rounded-3xl p-10 shadow-2xl border border-gray-700 relative overflow-hidden">
+        <!-- Abstract Decoration -->
+        <div class="absolute top-0 right-0 -mt-10 -mr-10 w-40 h-40 bg-primary-600 rounded-full mix-blend-multiply filter blur-3xl opacity-50"></div>
+        <div class="absolute bottom-0 left-0 -mb-10 -ml-10 w-40 h-40 bg-blue-500 rounded-full mix-blend-multiply filter blur-3xl opacity-30"></div>
+        
+        <div class="relative z-10">
+            <div class="text-center mb-10">
+                <div class="w-16 h-16 bg-gray-900 rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-lg border border-gray-700">
+                    <i data-feather="lock" class="text-primary-500 w-8 h-8"></i>
+                </div>
+                <h1 class="text-3xl font-black tracking-tight text-white mb-2">NexGen Admin</h1>
+                <p class="text-sm font-medium text-gray-400">Restricted Area. Authorized Personnel Only.</p>
+            </div>
+
+            <form method="post" class="space-y-6">
+                {% csrf_token %}
+                
+                {% if form.non_field_errors %}
+                    <div class="bg-red-500/10 text-red-400 p-4 rounded-xl text-sm font-bold border border-red-500/20 text-center">
+                        {{ form.non_field_errors }}
+                    </div>
+                {% endif %}
+
+                <div class="space-y-4">
+                    <div class="relative group">
+                        <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                            <i data-feather="mail" class="w-5 h-5 text-gray-500 group-focus-within:text-primary-500 transition-colors"></i>
+                        </div>
+                        <!-- Using raw HTML strings so developers using Django's default forms don't run into generic rendering blocks -->
+                        <input type="text" name="username" id="id_username" required placeholder="Admin Email" class="w-full bg-gray-900 border border-gray-700 rounded-xl py-4 pl-12 pr-4 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all shadow-inner">
+                        {{ form.username.errors }}
+                    </div>
+
+                    <div class="relative group">
+                        <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                            <i data-feather="key" class="w-5 h-5 text-gray-500 group-focus-within:text-primary-500 transition-colors"></i>
+                        </div>
+                        <input type="password" name="password" id="id_password" required placeholder="Security Key" class="w-full bg-gray-900 border border-gray-700 rounded-xl py-4 pl-12 pr-4 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all shadow-inner">
+                        {{ form.password.errors }}
+                    </div>
+                </div>
+
+                <input type="hidden" name="next" value="{{ next|default:'/store-admin/' }}">
+
+                <button type="submit" class="w-full bg-primary-600 hover:bg-primary-500 text-white font-bold py-4 px-4 rounded-xl shadow-lg hover:shadow-primary-500/25 transition-all flex justify-center items-center gap-2 group">
+                    Authenticate
+                    <i data-feather="arrow-right" class="w-4 h-4 opacity-70 group-hover:opacity-100 group-hover:translate-x-1 transition-all"></i>
+                </button>
+            </form>
+            
+            <div class="mt-8 text-center">
+                <a href="{% url 'home' %}" class="text-xs font-bold text-gray-500 hover:text-white transition-colors flex items-center justify-center gap-1">
+                    <i data-feather="arrow-left" class="w-3 h-3"></i> Return to Storefront
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        feather.replace();
+    </script>
+</body>
+</html>

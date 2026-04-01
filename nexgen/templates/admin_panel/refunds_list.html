@@ -1,0 +1,50 @@
+{% extends 'admin_panel/admin_base.html' %}
+{% block title %}Refunds - Admin Panel{% endblock %}
+
+{% block content %}
+<div class="mb-8 flex justify-between items-center">
+    <div>
+        <h1 class="text-3xl font-extrabold text-gray-900">Refund Requests</h1>
+        <p class="text-gray-500 mt-1">Review and process customer orders where a refund was requested.</p>
+    </div>
+</div>
+
+<div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+    <div class="overflow-x-auto">
+        <table class="w-full text-left text-sm text-gray-600">
+            <thead class="bg-gray-50 text-xs uppercase font-bold text-gray-500 border-b border-gray-100">
+                <tr>
+                    <th scope="col" class="px-6 py-4">Order ID</th>
+                    <th scope="col" class="px-6 py-4">Customer</th>
+                    <th scope="col" class="px-6 py-4">Date Requested</th>
+                    <th scope="col" class="px-6 py-4">Refund Amount</th>
+                    <th scope="col" class="px-6 py-4 text-right">Action</th>
+                </tr>
+            </thead>
+            <tbody class="divide-y divide-gray-100">
+                {% for order in orders %}
+                <tr class="hover:bg-red-50/30 transition-colors">
+                    <td class="px-6 py-4 font-bold text-gray-900">#{{ order.id }}</td>
+                    <td class="px-6 py-4 font-medium">{{ order.user.email }}</td>
+                    <td class="px-6 py-4 text-gray-500">{{ order.created_at|date:"M d, Y" }}</td>
+                    <td class="px-6 py-4 font-black text-red-600">${{ order.final_price }}</td>
+                    <td class="px-6 py-4 text-right">
+                        <a href="{% url 'admin_order_detail' order.id %}" class="bg-white text-gray-700 px-4 py-2 rounded-lg border border-gray-200 hover:bg-gray-50 font-bold shadow-sm inline-flex items-center gap-1">Process <i data-feather="chevron-right" class="w-4 h-4"></i></a>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="5" class="px-6 py-12 text-center text-gray-500">
+                        <div class="w-16 h-16 bg-green-50 text-green-500 rounded-full flex items-center justify-center mx-auto mb-4">
+                            <i data-feather="smile" class="w-8 h-8"></i>
+                        </div>
+                        <h3 class="text-lg font-bold text-gray-900">No Pending Refunds!</h3>
+                        <p class="text-gray-500 mt-2">All customers seem satisfied at the moment.</p>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

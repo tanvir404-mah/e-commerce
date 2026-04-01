@@ -1,0 +1,166 @@
+{% extends 'admin_panel/admin_base.html' %}
+{% block title %}Order #{{ order.id }} - NexGen Admin{% endblock %}
+
+{% block content %}
+<div class="mb-8 flex justify-between items-center border-b border-gray-200 pb-4">
+    <div>
+        <h1 class="text-3xl font-extrabold text-gray-900">Order #{{ order.id }}</h1>
+        <p class="text-gray-500 mt-1">Placed on {{ order.created_at|date:"F d, Y at g:i A" }}</p>
+    </div>
+    <a href="{% url 'admin_orders_list' %}" class="text-gray-500 hover:text-gray-900 font-medium flex items-center gap-1 transition-colors">
+        <i data-feather="arrow-left" class="w-4 h-4"></i> Back to Orders
+    </a>
+</div>
+
+<div class="lg:grid lg:grid-cols-3 gap-8">
+    <!-- Left Column: Order details & Status -->
+    <div class="col-span-2 space-y-8">
+        <!-- Order Items -->
+        <div class="glass p-6 rounded-2xl shadow-sm border border-gray-100">
+            <h2 class="text-xl font-bold border-b border-gray-100 pb-4 mb-4 text-gray-900">Items Ordered</h2>
+            <ul class="divide-y divide-gray-100 mb-6">
+                {% for item in order.items.all %}
+                <li class="py-4 flex flex-col sm:flex-row justify-between">
+                    <div class="flex gap-4 mb-2 sm:mb-0">
+                        <div class="w-16 h-16 bg-white rounded-xl flex items-center justify-center border border-gray-100 p-1">
+                            {% if item.product.image %}
+                                <img src="{{ item.product.image.url }}" alt="{{ item.product.title }}" class="max-h-full max-w-full object-contain">
+                            {% else %}
+                                <i data-feather="package" class="w-8 h-8 text-gray-200"></i>
+                            {% endif %}
+                        </div>
+                        <div class="flex flex-col justify-center">
+                            <span class="font-bold text-gray-900 line-clamp-1">{{ item.product.title }}</span>
+                            <span class="text-sm text-gray-500">{{ STORE_CURRENCY|default:'$' }}{{ item.price }} x {{ item.quantity }}</span>
+                        </div>
+                    </div>
+                    <div class="flex items-center justify-end">
+                        <span class="font-black text-lg text-gray-900">
+                            <!-- Needs simple math logically from item price * quant -->
+                            <span class="text-xs text-gray-400 font-medium uppercase tracking-widest mr-1">Row Total</span>
+                            <span class="text-primary-600">{{ STORE_CURRENCY|default:'$' }}{{ item.price }}</span>
+                        </span>
+                    </div>
+                </li>
+                {% endfor %}
+            </ul>
+        </div>
+
+        <!-- Status Form -->
+        <div class="glass p-6 rounded-2xl shadow-sm border border-gray-100">
+            <h2 class="text-xl font-bold border-b border-gray-100 pb-4 mb-4 text-gray-900">Fulfillment Status</h2>
+            
+            <form method="post" class="space-y-4 max-w-sm">
+                {% csrf_token %}
+                <div>
+                    <label for="{{ form.status.id_for_label }}" class="block text-sm font-bold text-gray-700 mb-2">Update Order Status</label>
+                    {{ form.status }}
+                </div>
+                <button type="submit" class="bg-primary-600 px-6 py-3 rounded-xl font-bold text-white shadow hover:shadow-md hover:bg-primary-700 transition-all flex items-center gap-2">
+                    <i data-feather="refresh-cw" class="w-4 h-4"></i> Confirm Status Change
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Right Column: Customer Details -->
+    <div class="col-span-1 space-y-8">
+        <!-- Customer Info -->
+        <div class="glass p-6 rounded-2xl shadow-sm border border-gray-100">
+            <h2 class="text-lg font-bold border-b border-gray-100 pb-4 mb-4 text-gray-900">Customer Details</h2>
+            <div class="flex items-center gap-3 mb-4">
+                <div class="w-10 h-10 bg-primary-100 text-primary-600 rounded-full flex items-center justify-center font-bold">
+                    <i data-feather="user" class="w-5 h-5"></i>
+                </div>
+                <div>
+                    <p class="font-bold text-gray-900">{{ order.user.first_name }} {{ order.user.last_name }}</p>
+                    <p class="text-sm text-gray-500">{{ order.user.email }}</p>
+                </div>
+            </div>
+            {% if order.user.phone_number %}
+            <div class="flex items-start gap-3 text-sm text-gray-600 mt-2">
+                <i data-feather="phone" class="w-4 h-4 mt-0.5 text-gray-400"></i>
+                <span>{{ order.user.phone_number }}</span>
+            </div>
+            {% endif %}
+        </div>
+
+        <!-- Shipping details -->
+        <div class="glass p-6 rounded-2xl shadow-sm border border-gray-100">
+            <h2 class="text-lg font-bold border-b border-gray-100 pb-4 mb-4 text-gray-900">Shipping Details</h2>
+            <div class="flex gap-3 text-sm text-gray-600 mt-2">
+                <i data-feather="map-pin" class="w-5 h-5 text-gray-400 flex-shrink-0"></i>
+                <p>{{ order.shipping_address|linebreaksbr }}</p>
+            </div>
+        </div>
+
+        <!-- Financial Summary -->
+        <div class="glass p-6 rounded-2xl bg-gray-50/80 shadow-sm border border-gray-100">
+            <h2 class="text-lg font-bold border-b border-gray-100 pb-4 mb-4 text-gray-900">Financial Summary</h2>
+            
+            <div class="mb-6 p-4 bg-white rounded-xl border border-gray-100 shadow-sm relative overflow-hidden">
+                <div class="absolute top-0 right-0 w-16 h-16 -mr-6 -mt-6 bg-primary-50 rounded-full opacity-50"></div>
+                <p class="text-xs font-black text-primary-600 uppercase tracking-widest mb-2 flex items-center gap-1">
+                    <i data-feather="monitor" class="w-3 h-3"></i> Payment Method
+                </p>
+                <div class="flex items-center gap-2">
+                    {% if order.payment_provider %}
+                        {% if order.payment_provider.logo %}
+                            <img src="{{ order.payment_provider.logo.url }}" class="w-6 h-6 object-contain" alt="">
+                        {% endif %}
+                        <span class="font-bold text-gray-900">{{ order.payment_provider.provider_name }}</span>
+                    {% else %}
+                        <span class="font-bold text-gray-500 italic">{{ order.payment_method|default:"Manual/COD" }}</span>
+                    {% endif %}
+                </div>
+                
+                <div class="mt-4 grid grid-cols-2 gap-4 border-t border-gray-50 pt-4">
+                    <div>
+                        <p class="text-[10px] text-gray-400 font-bold uppercase tracking-widest">TrxID</p>
+                        <p class="text-sm font-black {% if order.transaction_id %}text-gray-900{% else %}text-gray-300 italic{% endif %} select-all">
+                            {{ order.transaction_id|default:"Not Provided" }}
+                        </p>
+                    </div>
+                    <div>
+                        <p class="text-[10px] text-gray-400 font-bold uppercase tracking-widest">Sender</p>
+                        <p class="text-sm font-black {% if order.sender_number %}text-gray-900{% else %}text-gray-300 italic{% endif %} select-all">
+                            {{ order.sender_number|default:"Not Provided" }}
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="flex justify-between items-center text-sm text-gray-600 mb-3">
+                <span>Subtotal</span>
+                <span class="font-medium text-gray-900">{{ STORE_CURRENCY|default:'$' }}{{ order.total_price }}</span>
+            </div>
+            <div class="flex justify-between items-center text-sm text-gray-600 mb-4">
+                <span>Shipping</span>
+                <span class="font-medium text-green-600">Free</span>
+            </div>
+            <div class="flex justify-between items-center text-xl font-black text-gray-900 pt-4 border-t border-gray-200 mb-6">
+                <span>Total Amount</span>
+                <span>{{ STORE_CURRENCY|default:'$' }}{{ order.total_price }}</span>
+            </div>
+
+            {% if order.is_paid %}
+                <div class="flex items-center gap-2 justify-center text-xs font-bold text-green-700 bg-green-100 py-3 rounded-xl border border-green-200">
+                    <i data-feather="check-circle" class="w-4 h-4"></i> PAYMENT VERIFIED & SUCCESSFUL
+                </div>
+            {% else %}
+                <div class="space-y-3">
+                    <div class="flex items-center gap-2 justify-center text-xs font-bold text-amber-700 bg-amber-50 py-3 rounded-xl border border-amber-200">
+                        <i data-feather="clock" class="w-4 h-4"></i> PAYMENT PENDING VERIFICATION
+                    </div>
+                    <form action="{% url 'admin_order_mark_paid' order.pk %}" method="POST" onsubmit="return confirm('Please confirm you have verified the TrxID in your provider dashboard. This will mark the order as paid.');">
+                        {% csrf_token %}
+                        <button type="submit" class="w-full bg-primary-600 hover:bg-primary-700 text-white font-bold py-3 rounded-xl shadow-md hover:shadow-lg transition-all flex items-center justify-center gap-2">
+                             Verify & Mark as Paid <i data-feather="shield-check" class="w-4 h-4"></i>
+                        </button>
+                    </form>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

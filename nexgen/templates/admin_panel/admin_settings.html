@@ -1,0 +1,60 @@
+{% extends 'admin_panel/admin_base.html' %}
+{% block title %}Store Settings - NexGen Admin{% endblock %}
+
+{% block content %}
+<div class="mb-8 flex justify-between items-center border-b border-gray-200 pb-4">
+    <div>
+        <h1 class="text-3xl font-extrabold text-gray-900">Store Settings</h1>
+        <p class="text-gray-500 mt-1">Configure global store parameters like primary currency.</p>
+    </div>
+</div>
+
+<div class="max-w-2xl glass rounded-3xl p-8 shadow-sm">
+    <form method="post" class="space-y-6">
+        {% csrf_token %}
+        
+        {% if form.non_field_errors %}
+            <div class="bg-red-50 text-red-600 p-4 rounded-xl text-sm font-medium border border-red-100 flex items-center gap-2">
+                <i data-feather="alert-circle" class="w-5 h-5"></i>
+                {{ form.non_field_errors }}
+            </div>
+        {% endif %}
+
+        <div class="space-y-4">
+            {% for field in form %}
+                <div>
+                    <label for="{{ field.id_for_label }}" class="block text-sm font-bold text-gray-700 mb-2">{{ field.label }}</label>
+                    <div class="{% if field.errors %}ring-2 ring-red-500 rounded-2xl{% endif %} relative">
+                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none z-10">
+                            <i data-feather="dollar-sign" class="text-gray-400 w-5 h-5"></i>
+                        </div>
+                        {{ field }}
+                    </div>
+                    <!-- Override padding slightly since we inserted an absolute icon via widget injected styles-->
+                    <script>
+                        document.getElementById('{{ field.id_for_label }}').classList.add('pl-10');
+                    </script>
+                    
+                    {% if field.errors %}
+                        <p class="text-red-500 text-xs font-bold mt-1.5 flex items-center gap-1"><i data-feather="x-circle" class="w-3 h-3"></i>{{ field.errors.as_text }}</p>
+                    {% endif %}
+                    {% if field.help_text %}
+                        <p class="text-gray-400 text-xs mt-1.5 ml-1">{{ field.help_text|safe }}</p>
+                    {% endif %}
+                </div>
+            {% endfor %}
+            
+            <p class="text-xs text-gray-500 bg-blue-50 text-blue-800 p-3 rounded-xl border border-blue-100 flex gap-2 items-start mt-4">
+                <i data-feather="info" class="w-4 h-4 flex-shrink-0 mt-0.5"></i>
+                Changing the primary currency will instantly update the symbol displayed across the entire storefront and admin dashboard. Note that prices are not converted automatically.
+            </p>
+        </div>
+
+        <div class="pt-6 border-t border-gray-100 flex justify-end gap-3 mt-8">
+            <button type="submit" class="bg-primary-600 px-8 py-3 rounded-full font-bold text-white shadow-lg hover:shadow-xl hover:-translate-y-0.5 hover:bg-primary-700 transition-all flex items-center gap-2">
+                <i data-feather="save" class="w-4 h-4"></i> Apply Settings
+            </button>
+        </div>
+    </form>
+</div>
+{% endblock %}

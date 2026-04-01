@@ -1,0 +1,81 @@
+{% extends 'admin_panel/admin_base.html' %}
+{% block title %}User: {{ user_obj.email }} - Admin Panel{% endblock %}
+
+{% block content %}
+<div class="mb-8 flex justify-between items-start">
+    <div>
+        <a href="{% url 'admin_users_list' %}" class="inline-flex items-center gap-2 text-sm font-bold text-gray-400 hover:text-gray-900 mb-2 transition-colors">
+            <i data-feather="arrow-left" class="w-4 h-4"></i> Back to Customers
+        </a>
+        <h1 class="text-3xl font-extrabold text-gray-900">{{ user_obj.email }}</h1>
+        <p class="text-gray-500 mt-1">Joined {{ user_obj.date_joined|date:"M d, Y" }}</p>
+    </div>
+    <form action="{% url 'admin_user_toggle_active' user_obj.id %}" method="post">
+        {% csrf_token %}
+        {% if user_obj.is_active %}
+            <button type="submit" onclick="return confirm('Disable this account? They will be unable to log in.');" class="bg-red-50 text-red-600 px-4 py-2 rounded-xl font-medium border border-red-200 hover:bg-red-100 transition-colors shadow-sm flex items-center gap-2">
+                <i data-feather="slash" class="w-4 h-4"></i> Deactivate Account
+            </button>
+        {% else %}
+            <button type="submit" class="bg-green-50 text-green-600 px-4 py-2 rounded-xl font-medium border border-green-200 hover:bg-green-100 transition-colors shadow-sm flex items-center gap-2">
+                <i data-feather="check-circle" class="w-4 h-4"></i> Re-activate Account
+            </button>
+        {% endif %}
+    </form>
+</div>
+
+<div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8 text-gray-900">
+    <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
+        <p class="text-sm font-bold text-gray-500 mb-1">Lifetime Spend</p>
+        <h3 class="text-3xl font-black text-primary-600">${{ lifetime_spend }}</h3>
+    </div>
+    <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
+        <p class="text-sm font-bold text-gray-500 mb-1">Total Orders</p>
+        <h3 class="text-3xl font-black text-blue-600">{{ user_orders.count }}</h3>
+    </div>
+    <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
+        <p class="text-sm font-bold text-gray-500 mb-1">Account Status</p>
+        {% if user_obj.is_active %}
+            <h3 class="text-2xl font-black text-green-600">Active</h3>
+        {% else %}
+            <h3 class="text-2xl font-black text-red-600">Disabled</h3>
+        {% endif %}
+    </div>
+</div>
+
+<h3 class="text-lg font-bold text-gray-900 mb-4">Order History</h3>
+<div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+    <div class="overflow-x-auto">
+        <table class="w-full text-left text-sm text-gray-600">
+            <thead class="bg-gray-50 text-xs uppercase font-bold text-gray-500 border-b border-gray-100">
+                <tr>
+                    <th scope="col" class="px-6 py-4">Order ID</th>
+                    <th scope="col" class="px-6 py-4">Date</th>
+                    <th scope="col" class="px-6 py-4">Status</th>
+                    <th scope="col" class="px-6 py-4">Total</th>
+                    <th scope="col" class="px-6 py-4 text-right">Action</th>
+                </tr>
+            </thead>
+            <tbody class="divide-y divide-gray-100">
+                {% for order in user_orders %}
+                <tr class="hover:bg-gray-50 transition-colors">
+                    <td class="px-6 py-4 font-bold text-gray-900">#{{ order.id }}</td>
+                    <td class="px-6 py-4">{{ order.created_at|date:"M d, Y" }}</td>
+                    <td class="px-6 py-4">
+                        <span class="font-bold">{{ order.status }}</span>
+                    </td>
+                    <td class="px-6 py-4 font-black text-gray-900">${{ order.total_price }}</td>
+                    <td class="px-6 py-4 text-right">
+                        <a href="{% url 'admin_order_detail' order.id %}" class="text-primary-600 hover:underline">View Order &rarr;</a>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="5" class="px-6 py-8 text-center text-gray-500 font-medium">No orders found for this user.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

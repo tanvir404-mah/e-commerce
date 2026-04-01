@@ -1,0 +1,43 @@
+{% extends 'admin_panel/admin_base.html' %}
+{% block title %}{{ action }} Banner - Admin Panel{% endblock %}
+
+{% block content %}
+<div class="mb-8 flex justify-between items-center">
+    <div>
+        <a href="{% url 'admin_banners_list' %}" class="inline-flex items-center gap-2 text-sm font-bold text-gray-400 hover:text-gray-900 mb-2 transition-colors">
+            <i data-feather="arrow-left" class="w-4 h-4"></i> Back to Banners
+        </a>
+        <h1 class="text-3xl font-extrabold text-gray-900">{{ action }} Banner</h1>
+        <p class="text-gray-500 mt-1">Configure images and links for your homepage promotions.</p>
+    </div>
+</div>
+
+<div class="bg-white p-8 rounded-2xl shadow-sm border border-gray-100 max-w-2xl">
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        <div class="space-y-6">
+            {% for field in form %}
+            <div>
+                <label for="{{ field.id_for_label }}" class="block text-sm font-bold text-gray-900 mb-2">
+                    {{ field.label }} {% if field.field.required %}<span class="text-red-500">*</span>{% endif %}
+                </label>
+                {{ field }}
+                {% if field.help_text %}
+                    <p class="text-sm text-gray-500 mt-1">{{ field.help_text }}</p>
+                {% endif %}
+                {% if field.errors %}
+                    <div class="text-red-600 text-sm mt-1 font-medium">{{ field.errors }}</div>
+                {% endif %}
+            </div>
+            {% endfor %}
+        </div>
+        
+        <div class="mt-8 flex gap-4 border-t border-gray-100 pt-6">
+            <button type="submit" class="bg-primary-600 text-white px-6 py-3 rounded-xl font-bold hover:bg-primary-700 transition-colors shadow-sm focus:ring-4 focus:ring-primary-100 flex-1 flex items-center justify-center gap-2">
+                <i data-feather="save" class="w-5 h-5"></i> Save Banner
+            </button>
+            <a href="{% url 'admin_banners_list' %}" class="bg-gray-100 text-gray-700 px-6 py-3 rounded-xl font-bold hover:bg-gray-200 transition-colors focus:ring-4 focus:ring-gray-100 text-center w-32">Cancel</a>
+        </div>
+    </form>
+</div>
+{% endblock %}

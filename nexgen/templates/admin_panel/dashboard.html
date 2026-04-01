@@ -1,0 +1,163 @@
+{% extends 'admin_panel/admin_base.html' %}
+{% block title %}Admin Dashboard - NexGen{% endblock %}
+
+{% block content %}
+<div class="mb-8 flex justify-between items-center">
+    <div>
+        <h1 class="text-3xl font-extrabold text-gray-900">Dashboard Overview</h1>
+        <p class="text-gray-500 mt-1">Welcome to the NexGen control center.</p>
+    </div>
+    <a href="{% url 'admin_orders_list' %}" class="bg-primary-600 text-white px-5 py-2.5 rounded-xl font-medium flex items-center gap-2 hover:bg-primary-700 transition-colors shadow-sm">
+        <i data-feather="truck" class="w-4 h-4"></i> Manage Orders
+    </a>
+</div>
+
+<!-- Stat Cards -->
+<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-10 text-gray-900">
+    <!-- Revenue -->
+    <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 flex items-center justify-between group">
+        <div>
+            <p class="text-sm font-bold text-gray-500 mb-1">Total Revenue</p>
+            <h3 class="text-2xl font-black">{{ STORE_CURRENCY|default:'$' }}{{ total_revenue }}</h3>
+        </div>
+        <div class="w-12 h-12 rounded-xl bg-green-50 text-green-600 flex items-center justify-center group-hover:scale-110 transition-transform">
+            <i data-feather="dollar-sign" class="w-6 h-6"></i>
+        </div>
+    </div>
+    
+    <!-- Orders -->
+    <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 flex items-center justify-between group">
+        <div>
+            <p class="text-sm font-bold text-gray-500 mb-1">Total Orders</p>
+            <h3 class="text-2xl font-black">{{ total_orders }}</h3>
+        </div>
+        <div class="w-12 h-12 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center group-hover:scale-110 transition-transform">
+            <i data-feather="shopping-bag" class="w-6 h-6"></i>
+        </div>
+    </div>
+    
+    <!-- Products -->
+    <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 flex items-center justify-between group">
+        <div>
+            <p class="text-sm font-bold text-gray-500 mb-1">Products Listed</p>
+            <h3 class="text-2xl font-black">{{ total_products }}</h3>
+        </div>
+        <div class="w-12 h-12 rounded-xl bg-purple-50 text-purple-600 flex items-center justify-center group-hover:scale-110 transition-transform">
+            <i data-feather="package" class="w-6 h-6"></i>
+        </div>
+    </div>
+    
+    <!-- Customers -->
+    <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 flex items-center justify-between group">
+        <div>
+            <p class="text-sm font-bold text-gray-500 mb-1">Active Customers</p>
+            <h3 class="text-2xl font-black">{{ total_customers }}</h3>
+        </div>
+        <div class="w-12 h-12 rounded-xl bg-orange-50 text-orange-600 flex items-center justify-center group-hover:scale-110 transition-transform">
+            <i data-feather="users" class="w-6 h-6"></i>
+        </div>
+    </div>
+</div>
+
+<div class="grid grid-cols-1 sm:grid-cols-3 gap-6 mb-10 text-gray-900">
+    <div class="bg-yellow-50 p-6 rounded-2xl shadow-sm border border-yellow-100 flex items-center justify-between group">
+        <div>
+            <p class="text-sm font-bold text-yellow-600 mb-1">Pending Orders</p>
+            <h3 class="text-3xl font-black text-yellow-700">{{ pending_orders }}</h3>
+        </div>
+        <i data-feather="clock" class="w-10 h-10 text-yellow-400 opacity-50"></i>
+    </div>
+    <div class="bg-blue-50 p-6 rounded-2xl shadow-sm border border-blue-100 flex items-center justify-between group">
+        <div>
+            <p class="text-sm font-bold text-blue-600 mb-1">Processing</p>
+            <h3 class="text-3xl font-black text-blue-700">{{ processing_orders }}</h3>
+        </div>
+        <i data-feather="loader" class="w-10 h-10 text-blue-400 opacity-50"></i>
+    </div>
+    <div class="bg-indigo-50 p-6 rounded-2xl shadow-sm border border-indigo-100 flex items-center justify-between group">
+        <div>
+            <p class="text-sm font-bold text-indigo-600 mb-1">Shipped</p>
+            <h3 class="text-3xl font-black text-indigo-700">{{ shipped_orders }}</h3>
+        </div>
+        <i data-feather="truck" class="w-10 h-10 text-indigo-400 opacity-50"></i>
+    </div>
+</div>
+
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-10">
+    <!-- Low Stock Alerts -->
+    <div class="bg-white rounded-2xl shadow-sm border border-red-100 overflow-hidden">
+        <div class="px-6 py-5 border-b border-red-100 bg-red-50 flex justify-between items-center">
+            <h3 class="text-lg font-bold text-red-900 flex items-center gap-2">
+                <i data-feather="alert-triangle" class="w-5 h-5 text-red-600"></i> Low Stock Alerts
+            </h3>
+            <a href="{% url 'admin_products_list' %}" class="text-sm font-medium text-red-600 hover:text-red-700">Manage Inventory &rarr;</a>
+        </div>
+        <div class="overflow-x-auto">
+            <table class="w-full text-left text-sm text-gray-600">
+                <thead class="bg-gray-50/50 text-xs uppercase font-bold text-gray-500 border-b border-gray-100">
+                    <tr>
+                        <th scope="col" class="px-6 py-4">Product Name</th>
+                        <th scope="col" class="px-6 py-4">Current Stock</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-100">
+                    {% for item in low_stock_products %}
+                    <tr class="hover:bg-red-50/50 transition-colors">
+                        <td class="px-6 py-4 font-bold text-gray-900">{{ item.title }}</td>
+                        <td class="px-6 py-4 font-black text-red-600">{{ item.stock }} left</td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="2" class="px-6 py-8 text-center text-gray-500 font-medium">No low stock items.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- Recent Orders Section -->
+<div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+    <div class="px-6 py-5 border-b border-gray-100 flex justify-between items-center">
+        <h3 class="text-lg font-bold text-gray-900">Recent Orders</h3>
+        <a href="{% url 'admin_orders_list' %}" class="text-sm font-medium text-primary-600 hover:text-primary-700 flex items-center gap-1">View All <i data-feather="arrow-right" class="w-4 h-4"></i></a>
+    </div>
+    <div class="overflow-x-auto">
+        <table class="w-full text-left text-sm text-gray-600">
+            <thead class="bg-gray-50/50 text-xs uppercase font-bold text-gray-500 border-b border-gray-100">
+                <tr>
+                    <th scope="col" class="px-6 py-4 rounded-tl-lg">Order ID</th>
+                    <th scope="col" class="px-6 py-4">Customer</th>
+                    <th scope="col" class="px-6 py-4">Date</th>
+                    <th scope="col" class="px-6 py-4">Status</th>
+                    <th scope="col" class="px-6 py-4">Total</th>
+                    <th scope="col" class="px-6 py-4 text-right">Action</th>
+                </tr>
+            </thead>
+            <tbody class="divide-y divide-gray-100">
+                {% for order in recent_orders %}
+                <tr class="hover:bg-gray-50 transition-colors">
+                    <td class="px-6 py-4 font-bold text-gray-900">#{{ order.id }}</td>
+                    <td class="px-6 py-4 font-medium">{{ order.user.email }}</td>
+                    <td class="px-6 py-4 text-gray-500">{{ order.created_at|date:"M d, Y" }}</td>
+                    <td class="px-6 py-4">
+                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold {% if order.status == 'Delivered' %}bg-green-100 text-green-800{% elif order.status == 'Shipped' %}bg-blue-100 text-blue-800{% elif order.status == 'Cancelled' %}bg-red-100 text-red-800{% else %}bg-yellow-100 text-yellow-800{% endif %}">
+                            {{ order.status }}
+                        </span>
+                    </td>
+                    <td class="px-6 py-4 font-black text-gray-900">${{ order.total_price }}</td>
+                    <td class="px-6 py-4 text-right">
+                        <a href="{% url 'admin_order_detail' order.id %}" class="text-primary-600 hover:text-primary-800 font-medium hover:underline flex items-center justify-end gap-1">Manage <i data-feather="chevron-right" class="w-4 h-4"></i></a>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="6" class="px-6 py-12 text-center text-gray-500 font-medium">No orders have been placed yet.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

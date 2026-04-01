@@ -1,0 +1,27 @@
+{% extends 'admin_panel/admin_base.html' %}
+{% block title %}Confirm Deletion - NexGen Admin{% endblock %}
+
+{% block content %}
+<div class="min-h-[60vh] flex items-center justify-center">
+    <div class="max-w-md w-full glass rounded-[2rem] p-10 text-center shadow-2xl border border-red-100">
+        <div class="w-20 h-20 bg-red-100 text-red-600 rounded-full flex items-center justify-center mx-auto mb-6">
+            <i data-feather="alert-triangle" class="w-10 h-10"></i>
+        </div>
+        
+        <h2 class="text-2xl font-black text-gray-900 mb-2">Are you sure?</h2>
+        <p class="text-gray-500 mb-8">
+            You are about to permanently delete <strong class="text-gray-900 border-b border-gray-300 pb-0.5">{{ object }}</strong>. This action cannot be undone. All associated data will be lost.
+        </p>
+
+        <form method="post" class="flex flex-col sm:flex-row gap-4 justify-center">
+            {% csrf_token %}
+            <a href="{% url cancel_url %}" class="px-6 py-3 rounded-full font-bold text-gray-600 bg-gray-100 hover:bg-gray-200 transition-colors flex-1 shadow-sm">
+                Cancel
+            </a>
+            <button type="submit" class="px-6 py-3 rounded-full font-bold text-white bg-red-600 hover:bg-red-700 hover:shadow-lg hover:-translate-y-0.5 transition-all flex-1 shadow flex justify-center items-center gap-2">
+                <i data-feather="trash-2" class="w-4 h-4"></i> Yes, Delete
+            </button>
+        </form>
+    </div>
+</div>
+{% endblock %}

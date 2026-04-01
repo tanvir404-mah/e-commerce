@@ -1,0 +1,48 @@
+{% extends 'admin_panel/admin_base.html' %}
+{% block title %}Review Moderation - Admin Panel{% endblock %}
+
+{% block content %}
+<div class="mb-8 flex justify-between items-center">
+    <div>
+        <h1 class="text-3xl font-extrabold text-gray-900">Review Moderation</h1>
+        <p class="text-gray-500 mt-1">Approve or reject customer reviews before they appear publicly.</p>
+    </div>
+</div>
+
+<div class="grid grid-cols-1 gap-6">
+    {% for review in reviews %}
+    <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 flex flex-col md:flex-row gap-6">
+        <div class="flex-1">
+            <h3 class="text-lg font-bold text-gray-900">{{ review.product.title }}</h3>
+            <div class="flex items-center gap-2 mt-1 mb-3">
+                <span class="text-yellow-500 font-bold flex items-center gap-1">{{ review.rating }} <i data-feather="star" class="w-4 h-4 fill-current"></i></span>
+                <span class="text-gray-400 text-sm">by {{ review.user.email }} on {{ review.created_at|date:"M d, Y" }}</span>
+            </div>
+            <p class="text-gray-700 bg-gray-50 p-4 rounded-xl italic">"{{ review.comment }}"</p>
+        </div>
+        <div class="md:w-48 flex flex-col gap-3 justify-center border-t md:border-t-0 md:border-l border-gray-100 pt-4 md:pt-0 md:pl-6">
+            <form action="{% url 'admin_review_approve' review.id %}" method="post">
+                {% csrf_token %}
+                <button type="submit" class="w-full bg-green-50 text-green-700 px-4 py-2.5 rounded-xl font-bold border border-green-200 hover:bg-green-100 transition-colors shadow-sm flex items-center justify-center gap-2">
+                    <i data-feather="check"></i> Approve
+                </button>
+            </form>
+            <form action="{% url 'admin_review_reject' review.id %}" method="post">
+                {% csrf_token %}
+                <button type="submit" onclick="return confirm('Delete this review forever?');" class="w-full bg-red-50 text-red-700 px-4 py-2.5 rounded-xl font-bold border border-red-200 hover:bg-red-100 transition-colors shadow-sm flex items-center justify-center gap-2">
+                    <i data-feather="x"></i> Reject
+                </button>
+            </form>
+        </div>
+    </div>
+    {% empty %}
+    <div class="bg-gray-50 border border-gray-100 rounded-2xl p-12 text-center">
+        <div class="w-16 h-16 bg-green-50 text-green-500 rounded-full flex items-center justify-center mx-auto mb-4">
+            <i data-feather="check-circle" class="w-8 h-8"></i>
+        </div>
+        <h3 class="text-xl font-bold text-gray-900">All caught up!</h3>
+        <p class="text-gray-500 mt-2">There are no pending reviews waiting for moderation.</p>
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}
