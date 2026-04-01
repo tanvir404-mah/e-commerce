@@ -5,17 +5,13 @@ NexGen is a high-performance, feature-rich e-commerce solution built with Django
 
 👤 User Experience (Frontend)
 Dynamic Product Discovery: Search, filter by category, and sort products with ease.
-
 Wishlist & Cart: Save favorite items for later and manage a persistent shopping cart.
-
 Smart Checkout: Multiple shipping address support and dynamic delivery charge calculation.
-
 Coupon System: Real-time discount application via promo codes.
 
 Verified Reviews: 1-5 star rating system with moderated customer feedback.
 
 Order Tracking: Live status updates (Processing → Shipped → Delivered).
-
 User Dashboard: Manage profile, address book, and view order history with re-order functionality.
 
 🛡️ Admin Powerhouse (Backend)
